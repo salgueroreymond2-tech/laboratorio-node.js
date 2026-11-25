@@ -134,10 +134,10 @@ Tras publicar en HTTPS se deben ejecutar y documentar comprobaciones reales:
 
 ```mermaid
 flowchart LR
-    U["Navegador del Usuario"] -->|HTTPS TLS 1.2/1.3| P["Edge / Proxy Inverso PaaS<br/>(Terminación TLS + Let's Encrypt)"]
-    P -->|HTTP interno + X-Forwarded-*<br/>trust proxy = 1| App["Contenedor Docker SecureVault<br/>(Node.js 22 LTS + Express 5 + EJS)<br/>Usuario no root"]
-    App -->|Red privada WireGuard / TLS<br/>Sequelize + mysql2| DB[("MySQL 8 Gestionado<br/>securevault_db")]
-    GH["GitHub + GitHub Actions<br/>(npm ci, lint, tests, npm audit, Gitleaks)"] -->|Imagen / Deploy autorizado| P
+    U["Navegador del Usuario"] -->|HTTPS TLS 1.2/1.3| P["Edge / Proxy Inverso PaaS\n(Terminación TLS + Let's Encrypt)"]
+    P -->|HTTP interno + X-Forwarded-*\ntrust proxy = 1| App["Contenedor Docker SecureVault\n(Node.js 22 LTS + Express 5 + EJS)\nUsuario no root"]
+    App -->|Red privada WireGuard / TLS\nSequelize + mysql2| DB[("MySQL 8 Gestionado\nsecurevault_db")]
+    GH["GitHub + GitHub Actions\n(npm ci, lint, tests, npm audit, Gitleaks)"] -->|Imagen / Deploy autorizado| P
 ```
 
 ### 4.3 Manejo de secretos, base de datos y pipeline
