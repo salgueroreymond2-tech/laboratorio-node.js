@@ -1,0 +1,5 @@
+<%- include('../partials/head', { title: 'Mi nota' }) %>
+<main class="notes-layout notes-narrow" id="contenido"><header class="notes-top"><a class="notes-brand" href="/cuenta"><img src="/assets/images/brand/isotipo.svg" width="34" height="34" alt=""> SecureVault</a><a class="notes-text-link" href="/notas">Mis notas</a></header>
+  <div class="notes-heading"><div><p class="notes-kicker">NOTA PRIVADA</p><h1><%= note.title %></h1></div></div>
+  <article class="notes-paper"><div class="note-content"><%= note.content %></div><div class="notes-actions"><a class="notes-button" href="/notas/<%= note.id %>/editar">Editar nota</a><a class="notes-danger" href="/notas/<%= note.id %>/eliminar">Eliminar nota</a></div></article>
+</main></body></html>

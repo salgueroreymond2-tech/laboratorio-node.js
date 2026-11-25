@@ -1,0 +1,9 @@
+<%- include('../partials/head', { title: 'Iniciar sesión' }) %>
+<main class="auth-layout" id="contenido">
+  <section class="auth-intro"><a class="auth-brand" href="/inicio"><img src="/assets/images/brand/isotipo-light.svg" width="40" height="40" alt=""> SecureVault</a><div><p class="auth-eyebrow">TU ESPACIO PRIVADO</p><h1>Bienvenido de nuevo.</h1><p>Entra a tu cuenta para consultar tus notas privadas.</p></div><small>SecureVault · Entorno local</small></section>
+  <section class="auth-panel"><div class="auth-card"><a class="auth-back" href="/inicio">Volver al inicio</a><h2>Iniciar sesión</h2><p>Introduce tu correo y contraseña.</p>
+    <% if (message) { %><div class="auth-message" role="alert"><%= message %></div><% } %>
+    <form method="post" action="/acceso" class="auth-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><label for="email">Correo electrónico</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254"><label for="password">Contraseña</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Entrar a mi cuenta</button></form>
+    <p class="auth-switch"><a href="/recuperar">¿Olvidaste tu contraseña?</a></p><p class="auth-switch">¿No tienes cuenta? <a href="/registro">Crear cuenta</a></p>
+  </div></section>
+</main></body></html>

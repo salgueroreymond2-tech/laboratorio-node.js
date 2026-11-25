@@ -1,0 +1,7 @@
+# Registro y acceso local
+
+Las rutas `/registro`, `/acceso`, `/cuenta` y `/salir` implementan el registro, inicio, visualización básica de cuenta y cierre de sesión. El backend normaliza el correo, valida los campos con Zod, fuerza el rol `user`, usa bcrypt costo 12 y guarda sesiones en MySQL. La sesión se regenera al ingresar, tiene límite de inactividad de 30 minutos y caducidad absoluta de 12 horas; la página de cuenta verifica que el usuario siga activo y que su versión de sesión no haya cambiado. Las peticiones mutadoras exigen CSRF y se limitan los intentos de registro y acceso por IP en memoria.
+
+El secreto de sesión y el secreto CSRF son independientes y se cargan desde variables locales. En HTTP local las cookies no usan `Secure`; el modo de producción preparado sí lo exige, pero no se ha probado en una infraestructura real. El límite por IP permanece en memoria y existe bloqueo de cuenta persistente durante 15 minutos tras cinco intentos fallidos; no constituye un bloqueo progresivo completo. Los eventos de acceso se firman con HMAC. La lista de contraseñas comunes es limitada y la verificación de correo sigue pendiente. La recuperación de contraseña se probó con un proveedor simulado y requiere SMTP real. Las notas locales están descritas en [NOTAS_LOCALES.md](NOTAS_LOCALES.md).
+
+Las pruebas de integración utilizan exclusivamente `securevault_test_db`, cuentas sintéticas y limpieza de sus propios datos. No acreditan un despliegue ni una auditoría completa de seguridad.

@@ -9,7 +9,7 @@ Empaquetar SecureVault mediante **Docker multi-stage con usuario no root** y des
 
 ## Justificación
 1. **Compatibilidad nativa con MySQL:** Railway aprovisiona MySQL dentro del mismo proyecto y red privada cifrada sin exponer el puerto `3306` a internet.
-2. **Seguridad de transporte y proxy:** Tanto Railway como Render terminan TLS 1.2/1.3 con certificados gestionados (Let's Encrypt), redirigen HTTP a HTTPS e inyectan un único salto de proxy confiable (`app.set('trust proxy', 1)`).
+2. **Seguridad de transporte y proxy:** Comprobar TLS y redirección HTTPS en la plataforma elegida. El ajuste `trust proxy` debe determinarse y verificarse frente a la topología real antes de la publicación; no se presupone un número de saltos.
 3. **Portabilidad y mitigación de límites gratuitos:** Al basarse en `Dockerfile` y variables de entorno validadas con Zod, si el crédito de prueba/mensual gratuito de Railway se agota, el mismo contenedor puede desplegarse en Render + TiDB Cloud Starter (MySQL-compatible gratuito con TLS obligatorio) sin modificar código.
 
 ## Consecuencias

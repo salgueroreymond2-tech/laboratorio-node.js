@@ -1,0 +1,112 @@
+name: Verificaciones de SecureVault
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Calidad y pruebas unitarias
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test:unit
+      - run: npm run test:security
+      - run: npm audit --audit-level=high
+
+  mysql-integration:
+    name: Integración con MySQL aislado
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Iniciar MySQL efímero
+        shell: bash
+        run: |
+          set -euo pipefail
+          db_password="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+          echo "::add-mask::$db_password"
+          export MYSQL_ROOT_PASSWORD="$db_password"
+          docker run -d --name securevault-ci-mysql \
+            -e MYSQL_ROOT_PASSWORD -e MYSQL_DATABASE=securevault_test_db \
+            -p 127.0.0.1:3307:3306 mysql:8.4 >/dev/null
+          ready=false
+          for attempt in {1..60}; do
+            if docker exec -e MYSQL_PWD="$db_password" securevault-ci-mysql \
+              mysql -h 127.0.0.1 -u root -e 'USE securevault_test_db' >/dev/null 2>&1; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            echo 'MySQL de pruebas no está disponible.' >&2
+            exit 1
+          fi
+          {
+            echo 'MIGRATION_DB_HOST=127.0.0.1'
+            echo 'MIGRATION_DB_PORT=3307'
+            echo 'MIGRATION_DB_USER=root'
+            echo "MIGRATION_DB_PASSWORD=$db_password"
+            echo 'TEST_DB_HOST=127.0.0.1'
+            echo 'TEST_DB_PORT=3307'
+            echo 'TEST_DB_USER=root'
+            echo "TEST_DB_PASSWORD=$db_password"
+            echo 'NODE_ENV=test'
+          } >> "$GITHUB_ENV"
+      - run: npm run db:migrate -- --test
+      - run: npm run test:integration
+
+  secrets:
+    name: Escaneo de secretos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+
+  release-readiness:
+    name: Bloqueo de liberación pendiente
+    needs: [quality, mysql-integration, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+      - run: npm run check:release
+
+# Este workflow no despliega. El bloqueo de liberación falla deliberadamente
+# hasta implementar y verificar las funcionalidades y los controles faltantes.

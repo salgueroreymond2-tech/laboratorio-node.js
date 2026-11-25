@@ -1,0 +1,7 @@
+<%- include('../partials/head', { title: note && note.id ? 'Editar nota' : 'Nueva nota' }) %>
+<main class="notes-layout notes-narrow" id="contenido"><header class="notes-top"><a class="notes-brand" href="/cuenta"><img src="/assets/images/brand/isotipo.svg" width="34" height="34" alt=""> SecureVault</a><a class="notes-text-link" href="/notas">Mis notas</a></header>
+  <div class="notes-heading"><div><p class="notes-kicker">TU ESPACIO PRIVADO</p><h1><%= note && note.id ? 'Editar nota' : 'Nueva nota' %></h1><p>Escribe lo que quieres guardar en este espacio.</p></div></div>
+  <section class="notes-paper"><% if (message) { %><div class="auth-message" role="alert"><%= message %></div><% } %>
+    <form class="notes-form" method="post" action="<%= note && note.id ? '/notas/' + note.id + '/editar' : '/notas' %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><label for="title">Título</label><input id="title" name="title" required maxlength="120" value="<%= note ? note.title : '' %>" autocomplete="off"><label for="content">Contenido</label><textarea id="content" name="content" rows="12" required maxlength="4000"><%= note ? note.content : '' %></textarea><p class="notes-help">Hasta 120 caracteres en el título y 4000 en el contenido.</p><div class="notes-actions"><button class="notes-button" type="submit">Guardar nota</button><a class="notes-secondary" href="<%= note && note.id ? '/notas/' + note.id : '/notas' %>">Cancelar</a></div></form>
+  </section>
+</main></body></html>

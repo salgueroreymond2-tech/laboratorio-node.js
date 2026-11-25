@@ -1,0 +1,4 @@
+<%- include('../partials/head', { title: 'Eliminar nota' }) %>
+<main class="notes-layout notes-narrow" id="contenido"><header class="notes-top"><a class="notes-brand" href="/cuenta"><img src="/assets/images/brand/isotipo.svg" width="34" height="34" alt=""> SecureVault</a><a class="notes-text-link" href="/notas">Mis notas</a></header>
+  <section class="notes-paper notes-confirm"><p class="notes-kicker">CONFIRMAR ELIMINACIÓN</p><h1>¿Eliminar esta nota?</h1><p>Se eliminará «<%= note.title %>». Esta acción no se puede deshacer.</p><form method="post" action="/notas/<%= note.id %>/eliminar"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><div class="notes-actions"><button class="notes-button notes-button-danger" type="submit">Sí, eliminar</button><a class="notes-secondary" href="/notas/<%= note.id %>">Cancelar</a></div></form></section>
+</main></body></html>

@@ -18,7 +18,7 @@ Este documento define las reglas obligatorias de arquitectura, seguridad, calida
 - **Fail closed:** Ante fallos críticos de configuración o seguridad, el sistema debe abortar o denegar acceso, nunca degradar a un estado inseguro.
 
 ## 3. Estándares criptográficos y prohibiciones
-- **Contraseñas:** Hash exclusivamente con `Argon2id` (`memoryCost >= 19456`, `timeCost >= 2`, `parallelism = 1`).
+- **Contraseñas:** Hash con `bcrypt` y factor de costo mínimo 12. Rechazar entradas de más de 72 bytes UTF-8 para evitar el truncamiento silencioso de bcrypt.
 - **Datos sensibles (notas, teléfono, secretos MFA):** Cifrado autenticado `AES-256-GCM` centralizado en `src/lib/crypto.js`, con llave de 32 bytes, IV aleatorio único de 12 bytes por operación, tag de 16 bytes, versionado (`v1.iv.tag.ciphertext`) y AAD contextual cuando corresponda.
 - **Tokens de recuperación:** Almacenar únicamente el hash `SHA-256` del token generado con `crypto.randomBytes(32)`.
 - **Integridad de eventos:** Firmar registros de `security_events` con `HMAC-SHA256` usando una llave independiente de la llave de cifrado.

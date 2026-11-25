@@ -1,0 +1,8 @@
+<%- include('../partials/head', { title: 'Mis notas' }) %>
+<main class="notes-layout" id="contenido">
+  <header class="notes-top"><a class="notes-brand" href="/cuenta"><img src="/assets/images/brand/isotipo.svg" width="34" height="34" alt=""> SecureVault</a><a class="notes-text-link" href="/cuenta">Mi cuenta</a></header>
+  <div class="notes-heading"><div><p class="notes-kicker">TU ESPACIO PRIVADO</p><h1>Mis notas</h1><p>Tus notas se guardan cifradas y solo están disponibles desde tu cuenta.</p></div><a class="notes-button" href="/notas/nueva">Crear nota</a></div>
+  <% if (notes.length === 0) { %><section class="notes-empty"><span class="material-symbols-outlined" aria-hidden="true">description</span><h2>Tu espacio está listo</h2><p>Aún no tienes notas. Crea la primera cuando quieras.</p><a class="notes-button" href="/notas/nueva">Crear mi primera nota</a></section><% } else { %>
+  <div class="notes-grid"><% for (const note of notes) { %><article class="note-card"><div class="note-card-icon"><span class="material-symbols-outlined" aria-hidden="true">description</span></div><h2><a href="/notas/<%= note.id %>"><%= note.title %></a></h2><p>Nota privada</p><a class="notes-text-link" href="/notas/<%= note.id %>">Abrir nota</a></article><% } %></div>
+  <% } %><% if (page > 1 || hasNext) { %><nav class="notes-actions" aria-label="Páginas de notas"><% if (page > 1) { %><a class="notes-text-link" href="/notas?page=<%= page - 1 %>">Página anterior</a><% } %><span>Página <%= page %></span><% if (hasNext) { %><a class="notes-text-link" href="/notas?page=<%= page + 1 %>">Página siguiente</a><% } %></nav><% } %>
+</main></body></html>

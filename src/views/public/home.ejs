@@ -1,0 +1,26 @@
+<%- include('../partials/head', { title: 'Inicio' }) %>
+<div class="app-shell">
+  <%- include('../partials/sidebar') %>
+  <div class="app-main">
+    <header class="topbar">
+      <div class="topbar-left"><button class="menu-toggle icon-button" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Abrir navegación"><span class="material-symbols-outlined" aria-hidden="true">menu</span></button><div class="breadcrumb"><span>Espacio de trabajo</span><span class="slash">/</span><strong>Resumen</strong></div></div>
+      <div class="topbar-right"><span class="env-badge"><span class="env-dot"></span>Entorno local</span><span class="topbar-divider"></span><span class="account-chip"><span class="material-symbols-outlined" aria-hidden="true">shield_person</span><span>SecureVault</span></span></div>
+    </header>
+    <main id="contenido" class="content">
+      <div class="page-heading" id="resumen"><div><div class="eyebrow"><span></span> TU ESPACIO DE PRIVACIDAD</div><h1>Un lugar para lo que<br class="desktop-break"> importa.</h1><p>Estamos construyendo un espacio sencillo para cuidar tu información privada.</p></div><div class="heading-note"><span class="material-symbols-outlined" aria-hidden="true">lock</span><div><strong>Privacidad por diseño</strong><small>Una base para proteger tus datos</small></div></div></div>
+
+      <section class="hero-card" aria-labelledby="hero-title"><div class="hero-copy"><span class="hero-kicker"><span class="material-symbols-outlined" aria-hidden="true">shield</span> SECUREVAULT</span><h2 id="hero-title">Tu información merece<br>un lugar seguro.</h2><p>Accede a tu cuenta para crear y consultar notas cifradas en este entorno local.</p><a class="button button-light" href="/acceso">Iniciar sesión</a></div><div class="hero-art" aria-hidden="true"><div class="art-ring ring-one"></div><div class="art-ring ring-two"></div><div class="art-grid"></div><div class="art-shield"><img src="/assets/images/brand/isotipo-light.svg" width="122" height="122" alt=""></div><span class="art-spark spark-one"></span><span class="art-spark spark-two"></span></div><div class="hero-caption"><span class="material-symbols-outlined" aria-hidden="true">encrypted</span> HECHO PARA TU PRIVACIDAD</div></section>
+
+      <section class="overview-grid" aria-label="Información general">
+        <article class="card status-card" id="estado"><div class="card-top"><div class="icon-tile icon-blue"><span class="material-symbols-outlined" aria-hidden="true">monitor_heart</span></div><span class="micro-label">ESTADO EN VIVO</span></div><h3>Conexión del servicio</h3><p class="card-description">Comprobación del servidor y su conexión a la base de datos.</p><div class="status-row"><span class="status-indicator" data-status-dot></span><span class="status-text" data-status aria-live="polite">Comprobando conexión…</span><button class="refresh-button" type="button" data-refresh aria-label="Volver a comprobar el estado"><span class="material-symbols-outlined" aria-hidden="true">refresh</span></button></div><small class="status-time" data-status-time>La comprobación se realiza en este dispositivo.</small><noscript><p class="noscript-note">Activa JavaScript para consultar el estado desde esta página. También puedes <a href="/health">ver la respuesta técnica</a>.</p></noscript></article>
+        <article class="card principle-card" id="privacidad"><div class="card-top"><div class="icon-tile icon-soft"><span class="material-symbols-outlined" aria-hidden="true">shield_lock</span></div><span class="micro-label">NUESTRO ENFOQUE</span></div><h3>La privacidad primero</h3><p class="card-description">La información personal necesita controles claros, acceso autorizado y protección en cada paso.</p><a class="text-link" href="#proximamente">Ver qué sigue</a></article>
+        <article class="card stage-card"><div class="card-top"><div class="icon-tile icon-slate"><span class="material-symbols-outlined" aria-hidden="true">construction</span></div><span class="micro-label">PROYECTO</span></div><h3>En desarrollo</h3><p class="card-description">Las cuentas y notas están disponibles localmente. Seguimos trabajando en otras funciones.</p><span class="stage-pill"><span></span> Desarrollo en curso</span></article>
+      </section>
+
+      <section class="roadmap-section" id="proximamente" aria-labelledby="roadmap-title"><div class="section-heading"><div><div class="eyebrow muted">EL CAMINO ADELANTE</div><h2 id="roadmap-title">Construyendo tu espacio</h2><p>Estas funcionalidades aún están pendientes de implementar y verificar.</p></div><span class="section-caption">PRÓXIMAMENTE</span></div><div class="roadmap-card"><div class="roadmap-item"><div class="roadmap-icon"><span class="material-symbols-outlined" aria-hidden="true">notifications_active</span></div><div><h3>Alertas administrativas</h3><p>Avisos de seguridad para el equipo administrador.</p></div><span class="pending-pill">Pendiente</span></div></div></section>
+      <div class="bottom-callout"><span class="material-symbols-outlined" aria-hidden="true">info</span><p><strong>Una nota sobre este espacio.</strong> Ya puedes crear una cuenta y guardar notas privadas en este entorno local.</p></div>
+    </main>
+    <%- include('../partials/footer', { year }) %>
+  </div>
+</div>
+</body></html>

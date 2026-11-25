@@ -1,0 +1,6 @@
+<%- include('../partials/head', { title: 'Administración' }) %>
+<main class="notes-layout" id="contenido"><header class="notes-top"><a class="notes-brand" href="/cuenta"><img src="/assets/images/brand/isotipo.svg" width="34" height="34" alt=""> SecureVault</a><a class="notes-text-link" href="/cuenta">Mi cuenta</a></header>
+  <div class="notes-heading"><div><p class="notes-kicker">ADMINISTRACIÓN</p><h1>Panel de control</h1><p>Consulta las cuentas y los eventos disponibles en esta instalación.</p></div></div>
+  <div class="notes-grid"><article class="note-card"><p>Cuentas registradas</p><h2><%= summary.total %></h2><a class="notes-text-link" href="/admin/usuarios">Ver usuarios</a></article><article class="note-card"><p>Cuentas activas</p><h2><%= summary.active %></h2><a class="notes-text-link" href="/admin/usuarios">Consultar estados</a></article><article class="note-card"><p>Seguridad</p><h2>Eventos de acceso</h2><a class="notes-text-link" href="/admin/eventos">Ver eventos</a></article></div>
+  <p class="notes-help">El panel no permite acceder a las notas ni a los teléfonos privados de otras cuentas.</p>
+</main></body></html>

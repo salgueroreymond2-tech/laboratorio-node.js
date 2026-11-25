@@ -9,7 +9,7 @@
 - **Controladores (`controllers/`):** Orquestación HTTP pura (sin SQL ni lógica criptográfica directa).
 - **Servicios (`services/`):** Reglas de negocio, verificación de propiedad, límites de negocio (máximo de notas/tamaño), registro de eventos de seguridad y alertas.
 - **Repositorios y Modelos (`repositories/` + `models/`):** Acceso parametrizado a MySQL mediante Sequelize ORM.
-- **Núcleo Criptográfico y Utilidades (`lib/`):** `crypto.js` (AES-256-GCM con versionado de llaves, SHA-256, HMAC-SHA256), `password.js` (Argon2id), `logger.js` (Pino con redacción de campos sensibles) y `mailer.js`.
+- **Núcleo Criptográfico y Utilidades (`lib/`):** `crypto.js` (AES-256-GCM con versionado de llaves, SHA-256, HMAC-SHA256), `password.js` (bcrypt), `logger.js` (Pino con redacción de campos sensibles) y `mailer.js`.
 
 ---
 
@@ -22,7 +22,7 @@ flowchart TD
     MW -->|"Validación Zod + Auth/Role/Ownership"| Ctrl["Controladores HTTP\n(auth, notes, profile, admin, health)"]
     Ctrl --> Svc["Capa de Servicios\n(Negocio, Auditoría, Alertas, Mailer)"]
     Ctrl -->|"Render SSR (escape automático)"| Views["Vistas EJS + Assets Locales"]
-    Svc --> Lib["Núcleo Criptográfico y Logging\n(Argon2id, AES-256-GCM, HMAC, Pino)"]
+    Svc --> Lib["Núcleo Criptográfico y Logging\n(bcrypt, AES-256-GCM, HMAC, Pino)"]
     Svc --> Repo["Repositorios Sequelize"]
     Repo -->|"Consultas parametrizadas + Transacciones"| MySQL[("MySQL 8: securevault_db")]
     MW -->|"Session Store"| MySQL
@@ -185,7 +185,7 @@ sequenceDiagram
         Lim-->>U: HTTP 429 + mensaje genérico + evento AUTH_LOCKOUT
     else Permitido
         App->>DB: Buscar usuario por email normalizado
-        App->>App: argon2.verify(password_hash, password)
+        App->>App: bcrypt.compare(password, password_hash)
         alt Credenciales inválidas
             App->>Lim: Incrementar failed_count (backoff progresivo)
             App->>DB: Registrar SECURITY_EVENT (LOGIN_FAILED) + alerta si supera umbral
@@ -205,8 +205,8 @@ sequenceDiagram
 
 Centralizado exclusivamente en `src/lib/password.js` y `src/lib/crypto.js`:
 
-1. **Contraseñas (`password.js`):** `Argon2id` con `memoryCost: 19456` (19 MiB), `timeCost: 2`, `parallelism: 1`.
-2. **Cifrado de notas, teléfono y secreto TOTP (`crypto.js`):** `AES-256-GCM` con llave de 32 bytes, IV aleatorio de 12 bytes (`crypto.randomBytes(12)`) por operación, auth tag de 16 bytes y AAD contextual (`notes:<ownerId>` o `profile:<userId>`).
+1. **Contraseñas (`password.js`):** `bcrypt` con costo 12. Se rechazan contraseñas de más de 72 bytes UTF-8 para evitar truncamiento silencioso; esto limita el máximo anterior de 128 caracteres.
+2. **Cifrado de notas, teléfono y secreto TOTP (`crypto.js`):** `AES-256-GCM` con llave de 32 bytes, IV aleatorio de 12 bytes (`crypto.randomBytes(12)`) por operación y auth tag de 16 bytes. El AAD de notas incluye propietario, identificador de nota y campo, para impedir intercambios entre registros o campos; para el perfil incluirá usuario y campo.
    - Formato persistido: `version.iv.tag.ciphertext` (base64 para iv, tag y ciphertext).
    - Permite **rotación de llaves sin pérdida de datos**: `DATA_ENCRYPTION_KEYS` admite múltiples versiones (ej. `v1:<keyBase64>,v2:<keyBase64>`) y `DATA_ENCRYPTION_KEY_CURRENT` indica la versión activa para nuevos cifrados o re-cifrado controlado.
 3. **Tokens de recuperación (`crypto.js`):** `crypto.randomBytes(32).toString('hex')` entregado por correo; en `password_reset_tokens` se guarda únicamente `SHA-256(token)`.
