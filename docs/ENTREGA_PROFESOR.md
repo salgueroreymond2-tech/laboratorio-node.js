@@ -4,6 +4,7 @@
 
 - **Proyecto:** SecureVault, aplicación académica de notas privadas.
 - **Repositorio configurado:** https://github.com/salgueroreymond2-tech/laboratorio-node.js.git. No se ha verificado el acceso del docente; muchos cambios locales todavía no están publicados en Git.
+- **Estado de las ramas:** en la última revisión, la aplicación estaba en el PR #1 y `main` contenía solo el proyecto inicial de documentación. El despliegue registrado utilizaba ese commit anterior; no se ha confirmado que la aplicación esté publicada.
 - **URL pública y `/health` público:** pendientes de despliegue y verificación. No se dispone de una URL real.
 - **Prueba local:** con el servidor iniciado, abrir `http://127.0.0.1:3003/acceso` en este equipo; el puerto habitual configurado puede diferir al reiniciar. El acceso local no es una URL pública.
 - **Cuentas:** existen dos cuentas sintéticas locales, una de usuario y otra administrativa. Sus credenciales se conservan en archivos privados fuera de Git y deben entregarse por un canal privado, nunca dentro de este documento. No se han creado cuentas de producción.

@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import pino from "pino";
 import dotenv from "dotenv";
-import { loadConfig } from "./config/env.js";
+import { ConfigurationError, loadConfig } from "./config/env.js";
 import { createDatabase } from "./config/database.js";
 import { createApp } from "./app.js";
 import { configuredMailer } from "./config/mailer.js";
@@ -11,6 +11,22 @@ const logger = pino();
 let database;
 let server;
 let shuttingDown = false;
+let startupStage = "configuración";
+const safeDatabaseCodes = new Set([
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "ENOTFOUND",
+  "EHOSTUNREACH",
+  "ER_ACCESS_DENIED_ERROR",
+  "ER_BAD_DB_ERROR",
+  "ER_SSL_CONNECTION_ERROR",
+  "HANDSHAKE_NO_SSL_SUPPORT",
+  "CERT_HAS_EXPIRED",
+  "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+  "SELF_SIGNED_CERT_IN_CHAIN",
+  "ERR_TLS_CERT_ALTNAME_INVALID",
+]);
 
 async function shutdown(code) {
   if (shuttingDown) return;
@@ -74,6 +90,7 @@ try {
     }
   }
   const config = loadConfig();
+  startupStage = "correo";
   const recoveryConfig = configuredMailer();
   if (
     config.NODE_ENV === "production" &&
@@ -81,8 +98,10 @@ try {
     new URL(recoveryConfig.baseUrl).origin !== new URL(config.APP_URL).origin
   )
     throw new Error("El origen del correo no coincide con la aplicación");
+  startupStage = "base de datos";
   database = createDatabase(config);
   await database.authenticate();
+  startupStage = "aplicación";
   server = createServer(
     createApp({
       database,
@@ -98,6 +117,7 @@ try {
   );
   server.requestTimeout = 15000;
   server.headersTimeout = 10000;
+  startupStage = "servidor";
   await new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(
@@ -107,9 +127,25 @@ try {
     );
   });
   logger.info({ port: config.PORT }, "SecureVault iniciado");
-} catch {
-  logger.fatal(
-    "No se pudo iniciar el servicio; revise la configuración y la conexión",
-  );
+} catch (error) {
+  if (error instanceof ConfigurationError) {
+    logger.fatal(
+      { fields: error.fields },
+      "Configuración inválida; revise las variables indicadas",
+    );
+  } else if (startupStage === "base de datos") {
+    const code = error?.original?.code || error?.parent?.code || error?.code;
+    logger.fatal(
+      { code: safeDatabaseCodes.has(code) ? code : "NO_IDENTIFICADO" },
+      "No se pudo conectar con MySQL",
+    );
+  } else if (startupStage === "servidor" && error?.code === "EADDRINUSE") {
+    logger.fatal("No se pudo iniciar el servidor: el puerto está ocupado");
+  } else {
+    logger.fatal(
+      { stage: startupStage },
+      "No se pudo iniciar el servicio; revise la configuración de la etapa indicada",
+    );
+  }
   await shutdown(1);
 }

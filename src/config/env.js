@@ -76,6 +76,14 @@ const schema = z
     }
   });
 
+export class ConfigurationError extends Error {
+  constructor(fields) {
+    super(`Configuración inválida: ${fields.join(", ")}`);
+    this.name = "ConfigurationError";
+    this.fields = fields;
+  }
+}
+
 export function loadConfig(env = process.env) {
   const result = schema.safeParse(env);
   if (!result.success) {
@@ -83,7 +91,7 @@ export function loadConfig(env = process.env) {
     const fields = [
       ...new Set(result.error.issues.map((issue) => issue.path[0])),
     ];
-    throw new Error(`Configuración inválida: ${fields.join(", ")}`);
+    throw new ConfigurationError(fields);
   }
   return result.data;
 }

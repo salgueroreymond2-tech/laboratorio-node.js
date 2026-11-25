@@ -2,6 +2,10 @@
 
 **Estado: bloqueado; no existe un despliegue ni una URL pública verificados.** Se prepararon el arranque de producción, cookies seguras, validación de configuración, MySQL con TLS y un Dockerfile no root. Las pruebas locales incluyen un proxy simulado; no hay prueba de infraestructura real. Docker no pudo construirse porque el daemon no estaba disponible, y las migraciones de producción no se han ejecutado.
 
+**Diagnóstico de GitHub:** la última revisión identificó que el despliegue registrado corresponde al commit `4f89580` de `main`, cuyo árbol contiene documentación pero no incluye `package.json`, `Dockerfile` ni `src/server.js`. El código está en el PR #1, commit `368c26c`. La publicación de `main` podría activar el despliegue automático; no se ha fusionado ni desplegado este PR. El control `check:release` continúa fallando deliberadamente mientras falten verificaciones reales.
+
+El arranque informa nombres de variables inválidas y códigos de conexión MySQL de una lista controlada, sin registrar contraseñas, llaves ni valores de las variables. Esto facilita que una persona responsable identifique la etapa que falla una vez que la versión correcta esté disponible en el entorno autorizado.
+
 Se detectó Railway CLI 5.75.0; la identidad, el proyecto, sus servicios y la vinculación con GitHub no se han verificado. La publicación y cualquier modificación de infraestructura requieren autorización explícita y deben quedar a cargo de una persona responsable y habilitada para el servicio. La documentación oficial indica que los [términos de Railway](https://railway.com/legal/terms) contienen requisitos de edad y consentimiento.
 
 ## Configuración necesaria para revisión
