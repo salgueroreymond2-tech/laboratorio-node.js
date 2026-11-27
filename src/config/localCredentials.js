@@ -20,6 +20,8 @@ export function applyLocalCredentials(env = process.env, path = ".env.app") {
     "NOTES_ENCRYPTION_KEY",
     "AUDIT_HMAC_KEY",
     "MAIL_PROVIDER",
+    "RESEND_API_KEY",
+    "RESEND_FROM",
     "SMTP_HOST",
     "SMTP_PORT",
     "SMTP_USER",

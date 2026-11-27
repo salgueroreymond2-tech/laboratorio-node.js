@@ -67,3 +67,45 @@ test("SMTP deshabilitado por defecto y configuración parcial rechazada", async 
     }),
   );
 });
+
+test("Resend usa HTTPS, rechaza configuración incompleta y oculta errores del proveedor", async () => {
+  const env = {
+    MAIL_PROVIDER: "resend",
+    RESEND_API_KEY: "synthetic-api-key",
+    RESEND_FROM: "sender@example.invalid",
+    APP_URL: "https://example.invalid",
+  };
+  assert.throws(() => configuredMailer({ ...env, RESEND_API_KEY: "" }));
+  assert.throws(() =>
+    configuredMailer({ ...env, SMTP_HOST: "smtp.example.invalid" }),
+  );
+  assert.throws(() => configuredMailer({ ...env, MAIL_PROVIDER: "none" }));
+  assert.throws(() =>
+    configuredMailer({ ...env, APP_URL: "http://example.invalid" }),
+  );
+  let request;
+  const send = async (url, options) => {
+    request = { url, options };
+    return { ok: true };
+  };
+  const result = configuredMailer(env, undefined, send);
+  await result.mailer.sendRecovery(
+    "person@example.invalid",
+    "https://example.invalid/reset?token=synthetic",
+  );
+  assert.equal(request.url, "https://api.resend.com/emails");
+  assert.equal(request.options.method, "POST");
+  assert.equal(request.options.redirect, "error");
+  const body = JSON.parse(request.options.body);
+  assert.equal(body.from, env.RESEND_FROM);
+  assert.deepEqual(body.to, ["person@example.invalid"]);
+  assert.match(body.text, /token=synthetic/);
+  const failed = configuredMailer(env, undefined, async () => ({ ok: false }));
+  await assert.rejects(
+    failed.mailer.sendRecovery(
+      "person@example.invalid",
+      "https://example.invalid/reset",
+    ),
+    /^Error: No se pudo enviar el correo$/,
+  );
+});
