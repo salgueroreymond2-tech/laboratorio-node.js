@@ -1,8 +1,8 @@
 import { createServer } from "node:http";
 import pino from "pino";
-import dotenv from "dotenv";
 import { ConfigurationError, loadConfig } from "./config/env.js";
 import { createDatabase } from "./config/database.js";
+import { applyLocalCredentials } from "./config/localCredentials.js";
 import { createApp } from "./app.js";
 import { configuredMailer } from "./config/mailer.js";
 import { URL } from "node:url";
@@ -59,36 +59,7 @@ process.on("uncaughtException", () => {
 });
 
 try {
-  // A locally provisioned low-privilege account overrides only database credentials.
-  const appCredentials = dotenv.config({
-    path: ".env.app",
-    quiet: true,
-  }).parsed;
-  if (appCredentials) {
-    process.env.DB_USER = appCredentials.DB_USER;
-    process.env.DB_PASSWORD = appCredentials.DB_PASSWORD;
-    if (appCredentials.SESSION_SECRET)
-      process.env.SESSION_SECRET = appCredentials.SESSION_SECRET;
-    if (appCredentials.CSRF_SECRET)
-      process.env.CSRF_SECRET = appCredentials.CSRF_SECRET;
-    if (appCredentials.NOTES_ENCRYPTION_KEY)
-      process.env.NOTES_ENCRYPTION_KEY = appCredentials.NOTES_ENCRYPTION_KEY;
-    if (appCredentials.AUDIT_HMAC_KEY)
-      process.env.AUDIT_HMAC_KEY = appCredentials.AUDIT_HMAC_KEY;
-    for (const key of [
-      "MAIL_PROVIDER",
-      "SMTP_HOST",
-      "SMTP_PORT",
-      "SMTP_USER",
-      "SMTP_PASSWORD",
-      "SMTP_PASS",
-      "SMTP_SECURE",
-      "SMTP_FROM",
-      "PUBLIC_BASE_URL",
-    ]) {
-      if (appCredentials[key]) process.env[key] = appCredentials[key];
-    }
-  }
+  applyLocalCredentials();
   const config = loadConfig();
   startupStage = "correo";
   const recoveryConfig = configuredMailer();
