@@ -1,5 +1,7 @@
 # SecureVault
 
+Para conocer los pasos de conexión y despliegue, consulta [SecureVault en Railway](docs/PRODUCCION_RAILWAY_SECUREVAULT.md).
+
 SecureVault es un proyecto en desarrollo para almacenar notas privadas. Incluye registro, acceso, notas cifradas, perfil y administración en el entorno local. La recuperación de contraseña está implementada, pero requiere un proveedor SMTP real para enviar correos.
 
 El mailer admite SMTP con TLS o STARTTLS y también Resend mediante HTTPS. Para Resend configura `MAIL_PROVIDER=resend`, `RESEND_API_KEY`, `RESEND_FROM` y `APP_URL`; requiere una cuenta y un remitente autorizado por el proveedor. Los planes Free, Trial y Hobby de Railway bloquean SMTP saliente. El envío real debe verificarse con una cuenta y un correo autorizado. Ver [preparación de producción](docs/DEPLOY_PRODUCCION.md).
